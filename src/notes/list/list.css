@@ -1,0 +1,22 @@
+.note-list {
+  width: 50%;
+  overflow-y: auto;
+}
+
+.note-list--item {
+  background-color: var(--color_secondary);
+  margin: 0 0.5rem;
+  border: 1px solid var(--color_light);
+}
+
+.note-list--item:hover, .note-list--item:focus {
+  background-color: var(--color_secondary_light);
+}
+
+.note-list--item--button {
+  background: none;
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  height: 100%;
+}

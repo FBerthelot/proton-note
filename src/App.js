@@ -1,26 +1,66 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useState}  from 'react';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import {useNotes, NoteList, NoteViewer, NoteEditor} from './notes';
+
+const modeComponentMapper = {
+  view: NoteViewer,
+  edit: NoteEditor
 }
 
-export default App;
+export const App = () => {
+  const {notes, modifyOrCreateNote, deleteNote} = useNotes();
+  const [mode, setMode] = useState('view');
+  const [selectedNote, setSelectedNote] = useState(notes[0]);
+
+  const handleCancelEditNote = () => {
+    if(!selectedNote) {
+      setSelectedNote(() => notes[0]);
+    }
+    setMode(() => 'view');
+  }
+  const handleAddNewNote = () => {
+    setMode(() => 'edit')
+    setSelectedNote(() => undefined);
+  }
+  const handleSaveNote = newNote => {
+    const newNotes = modifyOrCreateNote(newNote);
+    setMode(() => 'view');
+    setSelectedNote(() => newNotes[0]);
+  }
+  const handleDeleteNote = () => {
+    const newNotes = deleteNote(selectedNote.id);
+    setMode(() => 'view');
+    setSelectedNote(() => newNotes[0]);
+  }
+
+
+  const SecondPanelComponent = modeComponentMapper[mode];
+  return (
+    <>
+      <header className="navbar">
+        <h1>Proton Note</h1>
+        <button
+          disabled={mode === 'edit'}
+          onClick={handleAddNewNote}
+        >
+          + New Note
+        </button>
+      </header>
+      <main className="main-content">
+        <NoteList
+          notes={notes}
+          disabled={mode === 'edit'}
+          onNoteSelection={setSelectedNote}
+          />
+        <SecondPanelComponent
+          note={selectedNote}
+          onEdit={() => setMode('edit')}
+          onCancel={handleCancelEditNote}
+          onSave={handleSaveNote}
+          onDelete={handleDeleteNote}
+          />
+      </main>
+    </>
+  );
+}
